@@ -25,13 +25,27 @@ format:
     ruff check --fix
     ruff format
 
+# Run notebooks/phonetic.ipynb to train the phonetic Wav2Vec2 model
+train-phonetic:
+    uv run papermill notebooks/phonetic.ipynb notebooks/phonetic.ipynb --log-output
+
 # Run notebooks/orthographic.ipynb to train the orthographic NeMo adapter model
 train-orthographic:
     uv run papermill notebooks/orthographic.ipynb notebooks/orthographic.ipynb --log-output
 
+# Run inference using data-demo/phonetic/ to test phonetic submission
+test-phonetic:
+    uv run phonetic_submission/main.py models/wav2vec2-phonetic-final/ data-demo/phonetic/utterance_metadata.jsonl
+
 # Run inference using data-demo/word/ to test orthographic submission
 test-orthographic:
     uv run orthographic_submission/main.py models/orthographic_benchmark_nemo/ASR-Adapter-best.nemo data-demo/word/utterance_metadata.jsonl
+
+# Create zip for phonetic submission to challenge
+pack-phonetic:
+    rm -f phonetic_submission.zip && \
+    (cd phonetic_submission && zip -r ../phonetic_submission.zip main.py) && \
+    (cd models && zip -r ../phonetic_submission.zip wav2vec2-phonetic-final/)
 
 # Create zip for orthographic submission to challenge
 pack-orthographic:
